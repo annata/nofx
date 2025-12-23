@@ -71,6 +71,9 @@ func (c *ClaudeClient) SetAPIKey(apiKey string, customURL string, customModel st
 func (c *ClaudeClient) setAuthHeader(reqHeaders http.Header) {
 	reqHeaders.Set("x-api-key", c.APIKey)
 	reqHeaders.Set("anthropic-version", "2023-06-01")
+	if c.config.McpServerUrl != "" {
+		reqHeaders.Set("anthropic-beta", "mcp-client-2025-11-20")
+	}
 }
 
 // buildUrl Claude uses /messages endpoint
@@ -87,6 +90,21 @@ func (c *ClaudeClient) buildMCPRequestBody(systemPrompt, userPrompt string) map[
 		"messages": []map[string]string{
 			{"role": "user", "content": userPrompt},
 		},
+	}
+
+	if c.config.McpServerUrl != "" {
+		mcp_servers := make(map[string]string, 4)
+		mcp_servers["type"] = "url"
+		mcp_servers["url"] = c.config.McpServerUrl
+		mcp_servers["name"] = "nofx-mcp"
+		if c.config.McpServerToken != "" {
+			mcp_servers["authorization_token"] = c.config.McpServerToken
+		}
+		requestBody["mcp_servers"] = []map[string]string{mcp_servers}
+		tools := make(map[string]string, 2)
+		tools["type"] = "mcp_toolset"
+		tools["mcp_server_name"] = "nofx-mcp"
+		requestBody["tools"] = []map[string]string{tools}
 	}
 
 	return requestBody

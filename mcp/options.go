@@ -124,6 +124,20 @@ func WithProvider(provider string) ClientOption {
 	}
 }
 
+// WithMcpServerUrl set remote mcp server url for tool
+func WithMcpServerUrl(mcpServerUrl string) ClientOption {
+	return func(c *Config) {
+		c.McpServerUrl = mcpServerUrl
+	}
+}
+
+// WithMcpServerToken set remote mcp server token, blank string means no need token
+func WithMcpServerToken(mcpServerToken string) ClientOption {
+	return func(c *Config) {
+		c.McpServerToken = mcpServerToken
+	}
+}
+
 // WithUseFullURL sets whether to use full URL
 func WithUseFullURL(useFullURL bool) ClientOption {
 	return func(c *Config) {
